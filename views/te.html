@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Text Editor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    
+    textarea {
+      width: 100%;
+      height: 300px;
+    }
+
+    button {
+      margin: 5px;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Text Editor</h2>
+  <textarea id="editor"></textarea>
+  <br>
+  <button id="saveButton">Save</button>
+
+  <script>
+    const editor = document.getElementById("editor");
+    const editButton = document.getElementById("editButton");
+    const saveButton = document.getElementById("saveButton");
+
+    editButton.addEventListener("click", function () {
+      // Enable the text editor for editing
+      editor.disabled = false;
+    });
+
+    saveButton.addEventListener("click", function () {
+      // Disable the text editor to prevent further editing
+      editor.disabled = true;
+
+      // Get the edited content
+      const editedContent = editor.value;
+
+      // You can save the content to a server or use browser storage
+      // For simplicity, we'll display the edited content here
+      alert("Saved content: \n" + editedContent);
+    });
+  </script>
+</body>
+</html>

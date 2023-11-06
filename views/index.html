@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html class="bg-base-100">
+
+<head>
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"> -->
+  <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+  <link rel="stylesheet" href="{{url_for('static',filename='src/css/custom.css')}}">
+</head>
+
+<body>
+  <div class="navbar bg-slate-50 px-40">
+    <div class="flex-1">
+      <a class="btn btn-ghost normal-case text-xl">Ngota Update</a>
+    </div>
+    <div class="flex-none">
+      <div class="dropdown dropdown-end">
+        <button class="btn btn-square btn-ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            class="inline-block w-5 h-5 stroke-current">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z">
+            </path>
+          </svg>
+        </button>
+        </label>
+        <ul tabindex="0" class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+          <li>
+            <a class="justify-between">
+              Profile
+              <span class="badge">New</span>
+            </a>
+          </li>
+          <li><a>Settings</a></li>
+          <li><a>Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-40 mt-10 ">
+
+    <!-- Alert -->
+    <div id="custom-alert" class="alert shadow-lg" style="display: none;">
+      <span></span>
+    </div>
+    <!-- Alert End -->
+
+    <div class="overflow-x-auto">
+      <table class="table">
+        <!-- head -->
+        <thead>
+          <tr>
+            <th>
+              <label>
+                <input type="checkbox" class="checkbox" />
+              </label>
+            </th>
+            <th>Node Name</th>
+            <th>Mac Address</th>
+            <th>FM Version</th>
+            <th>Unlocked</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if not mqtt_messages %}
+          <tr>
+            <td colspan="   2">No node is active</td>
+          </tr>
+          {% else %}
+          {% for node_name, data in mqtt_messages.items() %}
+          <tr>
+            <th>
+              <label>
+                <input type="checkbox" class="checkbox" data-node-name="{{ node_name }}" />
+              </label>
+            </th>
+            <td>
+              <div class="flex items-center space-x-3">
+                <div class="avatar">
+                  <div class="mask mask-squircle w-12 h-12">
+                    <img src="{{url_for('static', filename='src/img/esp8266.jpg')}}" />
+                  </div>
+                </div>
+                <div>
+                  <div class="font-bold">{{ node_name }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              {{ data['mac_addr'] }}
+            </td>
+            <td>{{ data['version'] }}</td>
+
+            <td>
+              <div class="badge badge-outline">{{ data['unlockstatus'] }}</div>
+            </td>
+
+            </td>
+            <th>
+              <button class="btn detail-button" data-node-name="{{ node_name }}"
+                data-mac-addr="{{ data['mac_addr'] }}">Detail</button>
+
+
+              <!-- Modal -->
+              <dialog id="{{ node_name }}" class="modal">
+                <div class="modal-box w-11/12 max-w-5xl bg-slate-100">
+                  <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                  </form>
+                  <!-- Start Modal Content -->
+
+                  <div class="grid grid-cols-2 grid-rows-2 gap-4">
+                    <div class="row-span-2">
+                      <p>{{node_name}}.json</p>
+                      <form method="POST" action="{{ url_for('main.save_config', node_name=node_name) }}">
+                        <textarea name="config_content" rows="22" cols="60"
+                          class="textarea textarea-bordered font-medium"
+                          placeholder="Bio">{{ config_content }}</textarea>
+                        <button type="submit">Save</button>
+                      </form>
+                    </div>
+
+                    <div class="w-full">
+
+                      <div class="card bg-base-100 mt-5 ms-5">
+                        <div class="card-body">
+
+                          <div class="grid grid-cols-2 grid-rows-1 gap-2">
+                            <div>
+                              <p>Current Version : {{data['version']}}</p>
+                              <p class="font-normal">Latest Version : <span id="latestVersion_{{ node_name }}"></span>
+                              </p>
+                            </div>
+                            <div class="flex justify-end">
+                              <button class="btn update-button" data-node-name="{{ node_name }}">Update</button>
+
+                            </div>
+                          </div>
+
+
+
+                        </div>
+
+                      </div>
+                      <!-- Change Log -->
+                      <textarea name="config_content" rows="5" cols="55"
+                        class="textarea textarea-bordered font-medium ms-5 mt-5" placeholder="Bio"
+                        id="changeLogDisplay_{{ node_name }}" disabled></textarea>
+
+                      <div class="mt-5">
+                        <div class="join ms-5 ">
+                          <select class="select select-bordered  font-medium join-item "
+                            id="firmwareSelect_{{node_name}}">
+                            <option disabled selected>------------ Select Firmware to Install ------------</option>
+                          </select>
+                          <button class="btn join-item -button"
+                            data-node-name="{{ node_name }}">Install</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row-span-2 col-start-2 row-start-2">
+                      <div class="max-w-xl ms-5">
+                        <p class="mb-2">Upload .bin</p>
+                        <form id="uploadForm" enctype="multipart/form-data" action="/upload/{{ node_name }}"
+                          method="POST">
+                          <label
+                            class="flex justify-center w-full h-32 px-4 transition bg-white border-2 border-gray-300 rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none">
+                            <span class="flex items-center space-x-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-600" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                              </svg>
+                              <span class="font-medium text-gray-600">
+                                Drop files to Attach, or
+                                <span class="text-blue-600 underline">browse</span>
+                              </span>
+                            </span>
+                            <input type="file" id="fileInput_{{node_name}}" name="file_upload" class="file-input1 mt-5"
+                              hidden />
+                          </label>
+                          <p id="selectedFileName_{{ node_name }}" class="mt-5">No File Selected</p>
+                          <div class="join mt-5">
+                            <input type="text" value="{{ data['mac_addr'] }}" placeholder="Mac"
+                              class="input input-bordered w-full max-w-xs " name="mac" hidden />
+                            <input type="text" placeholder="Version"
+                              class="input input-bordered w-full max-w-xs join-item rounded-md" name="version"
+                              required />
+                            <input type="text" placeholder="Change Log"
+                              class="input input-bordered w-full max-w-xs join-item rounded-md" name="change_log"
+                              required />
+                            <button type="submit" class="btn join-item">Upload Bin</button>
+                          </div>
+
+
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <!-- End Modal Content -->
+
+                </div>
+    </div>
+    </dialog>
+
+    </th>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+
+    </table>
+  </div>
+  <div class="fixed bottom-20">
+    <button class="btn" id="unlock-button" href="{{ url_for('main.unlock_node', node=node_name) }}">Unlock</button>
+    <button class="btn" id="restart-button" href="{{ url_for('main.restart_node', node=node_name) }}">Restart</button>
+  </div>
+
+
+  </div>
+
+  <script src="{{url_for('static',filename='src/js/custom.js')}}"></script>
+  <script src="{{url_for('static',filename='src/js/detail.js')}}"></script>
+</body>
+
+
+</html>

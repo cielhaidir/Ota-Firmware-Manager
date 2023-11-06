@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Unggah OTA Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            text-align: center;
+            margin: 0;
+        }
+
+        .container {
+            width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        input[type="file"], input[type="text"] {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Unggah OTA Update</h1>
+        <form action="/upload_firmware" method="POST" enctype="multipart/form-data">
+            <label for="ota_version">Versi OTA:</label>
+            <input type="text" name="version" id="version" required>
+            <label for="ota_update_file">File OTA Update:</label>
+            <input type="file" name="firmware_file" id="firmware_file" required>
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+</body>
+</html>

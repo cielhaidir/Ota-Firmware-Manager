@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Firmware Management</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">
+  <style>
+    /* Tambahkan latar belakang dengan warna */
+    .header-background {
+      background-color: #00d1e8; /* Ganti dengan warna latar belakang yang Anda inginkan */
+      padding: 10px; /* Sesuaikan dengan jarak yang diinginkan di sekitar teks */
+      border-radius: 5px; /* Tambahkan sudut yang dibulatkan jika diperlukan */
+      color: #fff; /* Warna teks yang sesuai */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mt-3 text-center header-background">Firmware Management</h1>
+
+    <!-- List of firmware versions as a card with a dropdown -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h2 class="card-title">Available Firmware Versions</h2>
+        
+        <ul class="list-group" id="firmwareList">
+          <!-- List of firmware versions -->
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Firmware Version 1.0
+            <span>
+              <button type="button" class="btn btn-warning editVersionButton">Edit</button>
+              <button type="button" class="btn btn-danger deleteVersionButton">Delete</button>
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Firmware Version 1.1
+            <span>
+              <button type="button" class="btn btn-warning editVersionButton">Edit</button>
+              <button type="button" class="btn btn-danger deleteVersionButton">Delete</button>
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Firmware Version 1.2
+            <span>
+              <button type="button" class="btn btn-warning editVersionButton">Edit</button>
+              <button type="button" class="btn btn-danger deleteVersionButton">Delete</button>
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Firmware Version 1.3
+            <span>
+              <button type="button" class="btn btn-warning editVersionButton">Edit</button>
+              <button type="button" class="btn btn-danger deleteVersionButton">Delete</button>
+            </span>
+          </li>
+        </ul>
+        
+        <button class="btn btn-primary mt-3" id="addVersionButton">Add Firmware</button>
+      </div>
+    </div>
+    
+    <!-- Modal untuk Edit Firmware -->
+    <div class="modal fade" id="editVersionModal" tabindex="-1" role="dialog" aria-labelledby="editVersionModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editVersionModalLabel">Edit Firmware Version</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <!-- Isi formulir pengeditan firmware di sini -->
+            <input type="text" class="form-control" id="editVersionInput" placeholder="Edit Firmware Version">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="saveEditButton">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>    
+    <!-- Modal untuk Konfirmasi Hapus Firmware -->
+    <div class="modal fade" id="deleteVersionConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteVersionConfirmModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteVersionConfirmModalLabel">Konfirmasi Hapus Firmware</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Apakah Anda yakin ingin menghapus versi firmware ini?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteVersionButton">Ya</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Form to upload new firmware as a card -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h2 class="card-title">Upload New Firmware</h2>
+        <form action="upload.php" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="firmwareFile">Select Firmware File (ZIP):</label>
+            <input type="file" class="form-control" name="firmwareFile" id="firmwareFile" accept=".zip">
+            <br>
+          </div>
+          <button type="submit" class="btn btn-primary">Upload Firmware</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Install the latest firmware version as a card -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h2 class="card-title">Install Latest Firmware</h2>
+        <p class="card-text">Click the button to install the latest firmware version.</p>
+        <button class="btn btn-success" id="installButton">Install Latest Firmware</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const selectVersionButton = document.getElementById("selectVersionButton");
+    const firmwareVersions = document.getElementById("firmwareVersions");
+
+    selectVersionButton.addEventListener("click", function () {
+      const selectedVersion = firmwareVersions.value;
+      alert("Selected firmware version: " + selectedVersion);
+    });
+    const firmwareList = document.getElementById("firmwareList");
+  const addVersionButton = document.getElementById("addVersionButton");
+  const deleteVersionConfirmModal = new bootstrap.Modal(document.getElementById("deleteVersionConfirmModal"));
+  </script>
+  <script>
+    // Aktifkan modal edit saat tombol "Edit" diklik
+    document.querySelectorAll('.editVersionButton').forEach(function (button) {
+      button.addEventListener('click', function () {
+        var editVersionModal = new bootstrap.Modal(document.getElementById('editVersionModal'));
+        editVersionModal.show();
+      });
+    });
+  
+    // Aktifkan modal konfirmasi hapus saat tombol "Delete" diklik
+    document.querySelectorAll('.deleteVersionButton').forEach(function (button) {
+      button.addEventListener('click', function () {
+        var deleteVersionModal = new bootstrap.Modal(document.getElementById('deleteVersionConfirmModal'));
+        deleteVersionModal.show();
+      });
+    });
+  </script>
+  
+  
+  
+</body>
+</html>
