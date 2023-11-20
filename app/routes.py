@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, send_file, render_template, request, redirect, url_for
+from flask import Blueprint, jsonify, send_file, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 import os
 import paho.mqtt.client as mqtt
@@ -26,6 +26,11 @@ def version_is_greater(new_version, existing_version):
 @main_bp.route("/")
 def main():
     return render_template('index.html', mqtt_messages=mqtt_data)
+
+
+@main_bp.route("/compiler")
+def compiler():
+    return render_template('compiler.html')
 
 
 # ======================================================== #
@@ -115,36 +120,6 @@ def download_firmware(firmware_version):
 
 
 # ============================================================================================ #
-# **********************************Show and Handle Upload************************************ #
-
-@main_bp.route('/upload_firmware', methods=['GET', 'POST'])
-def upload_firmware():
-    if request.method == 'POST':
-        if 'firmware_file' not in request.files:
-            return jsonify({"status": "error", "message": "No file part"}), 400
-
-        firmware_file = request.files['firmware_file']
-        firmware_version = request.form.get('version')
-
-        if firmware_file.filename == '' or not firmware_file.filename.endswith('.bin'):
-            return jsonify({"status": "error", "message": "Invalid file format. Please upload a .bin file."}), 400
-
-        if firmware_file:
-            firmware_filename = secure_filename(firmware_file.filename)
-            new_firmware_filename = f"{firmware_filename.split('.')[0]}_{firmware_version}.bin"
-            firmware_path = os.path.join(SOURCE_FOLDER_PATH, "bin", new_firmware_filename)
-            firmware_file.save(firmware_path)
-
-            version_file_path = os.path.join(SOURCE_FOLDER_PATH, "bin", f"{firmware_filename.split('.')[0]}.version")
-            with open(version_file_path, 'w') as version_file:
-                version_file.write(firmware_version)
-
-            return jsonify({"status": "success", "message": "Firmware file uploaded and renamed successfully."}), 200
-
-    return render_template('upload_firmware.html')
-
-
-# ============================================================================================ #
 
 
 @main_bp.route('/save_config/<node_name>', methods=['POST'])
@@ -218,3 +193,51 @@ def get_change_log(node_name):
         return log_content
     except FileNotFoundError:
         return "Change log not available"
+    
+
+# ============================================================================================ #
+
+
+@main_bp.route('/classify', methods=['POST'])
+def classify_arduino_code(arduino_code):
+
+    define_part = []
+    custom_functions = {}
+    setup_code = []
+    loop_code = []
+
+    lines = arduino_code.split('\n')
+    current_section = None
+
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith("void "):
+            # Assume user-defined functions start with "void"
+            function_name = line.split(' ')[1].split('(')[0]
+            current_section = "Custom Function"
+            custom_functions[function_name] = []
+        elif line.startswith("void setup()"):
+            current_section = "setup"
+        elif line.startswith("void loop()"):
+            current_section = "loop"
+        elif current_section == "Define Part":
+            define_part.append(line)
+        elif current_section == "Custom Function":
+            custom_functions[function_name].append(line)
+
+        # Check for starting line of a new section
+        if line.startswith("#include") or line.startswith("#define"):
+            current_section = "Define Part"
+
+    define_part_code = '\n'.join(define_part)
+    custom_functions_code = {func: '\n'.join(code) for func, code in custom_functions.items()}
+    setup_code = custom_functions_code.pop("setup", "")
+    loop_code = custom_functions_code.pop("loop", "")
+
+    return {
+        "Define Part": define_part_code,
+        "Custom Functions": custom_functions_code,
+        "setup": setup_code,
+        "loop": loop_code,
+    }

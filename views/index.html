@@ -8,7 +8,7 @@
 </head>
 
 <body>
-  <div class="navbar bg-slate-50 px-40">
+  <div class="navbar shadow-xl rounded-2xl px-40 py-4">
     <div class="flex-1">
       <a class="btn btn-ghost normal-case text-xl">Ngota Update</a>
     </div>
@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <div class="container mx-auto px-40 mt-10 ">
+  <div class="container mx-auto px-40 mt-16 ">
 
     <!-- Alert -->
     <div id="custom-alert" class="alert shadow-lg" style="display: none;">
@@ -93,7 +93,7 @@
             <td>{{ data['version'] }}</td>
 
             <td>
-              <div class="badge badge-outline">{{ data['unlockstatus'] }}</div>
+              <div class="badge  badge-error">{{ data['unlockstatus'] }}</div>
             </td>
 
             </td>
@@ -111,21 +111,21 @@
                   <!-- Start Modal Content -->
 
                   <div class="grid grid-cols-2 grid-rows-2 gap-4">
-                    <div class="row-span-2">
+                    <div class="row-span-2 mt-5">
                       <p>{{node_name}}.json</p>
                       <form method="POST" action="{{ url_for('main.save_config', node_name=node_name) }}">
                         <textarea name="config_content" rows="22" cols="60"
                           class="textarea textarea-bordered font-medium"
                           placeholder="Bio">{{ config_content }}</textarea>
-                        <button type="submit">Save</button>
+                        <button class="btn" type="submit">Save</button>
                       </form>
                     </div>
 
                     <div class="w-full">
-
-                      <div class="card bg-base-100 mt-5 ms-5">
+                      <p class="mb-2 ms-5 mt-5">Check Latest Firmware</p>
+                      <div class="card bg-base-100 ms-5">
                         <div class="card-body">
-
+                          
                           <div class="grid grid-cols-2 grid-rows-1 gap-2">
                             <div>
                               <p>Current Version : {{data['version']}}</p>
@@ -133,7 +133,7 @@
                               </p>
                             </div>
                             <div class="flex justify-end">
-                              <button class="btn update-button" data-node-name="{{ node_name }}">Update</button>
+                              <button class="btn update-button" data-node-name="{{ node_name }}">Install Latest</button>
 
                             </div>
                           </div>
@@ -143,21 +143,55 @@
                         </div>
 
                       </div>
+                      <p class="mb-2 ms-5 mt-5">Firmware Change Log</p>
+                      
                       <!-- Change Log -->
-                      <textarea name="config_content" rows="5" cols="55"
-                        class="textarea textarea-bordered font-medium ms-5 mt-5" placeholder="Bio"
-                        id="changeLogDisplay_{{ node_name }}" disabled></textarea>
+                      <!-- <textarea name="config_content" rows="5" cols="55"
+                        class="textarea textarea-bordered font-medium ms-5" placeholder="Bio"
+                        id="changeLogDisplay_{{ node_name }}" disabled></textarea> -->
+
+                        <div class="overflow-x-auto ms-5">
+                          <table class="table">
+                            <!-- head -->
+                            <thead>
+                              <tr>
+                                <th></th>
+                                <th>Version</th>
+                                <th>ChangeLog</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <th>1</th>
+                                <td>2.00</td>
+                                <td>Quality Control Specialist</td>
+                                <td>11:13:2023</td>
+                                <td><button class="btn btn-xs  join-item install-button"
+                                  data-node-name="{{ node_name }}">Rename</button><button class="btn btn-xs join-item install-button"
+                                  data-node-name="{{ node_name }}">Delete</button></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
 
                       <div class="mt-5">
+                        <p class="mb-2 ms-5">Install Custom Firmware</p>
                         <div class="join ms-5 ">
                           <select class="select select-bordered  font-medium join-item "
                             id="firmwareSelect_{{node_name}}">
                             <option disabled selected>------------ Select Firmware to Install ------------</option>
                           </select>
-                          <button class="btn join-item -button"
+                          <button class="btn join-item install-button"
                             data-node-name="{{ node_name }}">Install</button>
                         </div>
                       </div>
+
+
+
+
                     </div>
 
                     <div class="row-span-2 col-start-2 row-start-2">
@@ -218,6 +252,7 @@
   <div class="fixed bottom-20">
     <button class="btn" id="unlock-button" href="{{ url_for('main.unlock_node', node=node_name) }}">Unlock</button>
     <button class="btn" id="restart-button" href="{{ url_for('main.restart_node', node=node_name) }}">Restart</button>
+    <a class="btn" href="{{ url_for('main.compiler') }}">Add Node Configuration</a>
   </div>
 
 

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html class="bg-base-100">
+
+<head>
+
+    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='src/css/custom.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/theme/lucario.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/theme/material.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/addon/display/fullscreen.css">
+
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar shadow-xl rounded-2xl px-40 py-4">
+        <div class="flex-1">
+            <a class="btn btn-ghost normal-case text-xl">Ngota Update</a>
+        </div>
+        <div class="flex-none">
+            <div class="dropdown dropdown-end">
+                <button class="btn btn-square btn-ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        class="inline-block w-5 h-5 stroke-current">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z">
+                        </path>
+                    </svg>
+                </button>
+                </label>
+                <ul tabindex="0"
+                    class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                    <li>
+                        <a class="justify-between">
+                            Profile
+                            <span class="badge">New</span>
+                        </a>
+                    </li>
+                    <li><a>Settings</a></li>
+                    <li><a>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- NAVBAR -->
+
+    <h1 class="text-5xl font-bold text-center mt-10">Web Compiler</h1>
+    
+
+    <div class="px-40 mt-16 fixed bottom-20">
+        <div class="join grid grid-cols-2">
+            <button id="prevButton" class="join-item btn btn-outline">Previous page</button>
+            <button id="nextButton" class="join-item btn btn-outline">Next</button>
+        </div>
+    </div>
+    
+    <!--  Page 1 -->
+    <div class="container mx-auto px-40 mt-16" id="page1">
+        <div class="grid grid-cols-4 grid-rows-4 gap-4 text-center mt-10">
+            <div><input type="text" placeholder="Node Number" class="input input-bordered w-full max-w-xs" /></div>
+            <div><input type="text" placeholder="Custom Mac" class="input input-bordered w-full max-w-xs" /></div>
+            <div><input type="text" placeholder="Firmware Version" class="input input-bordered w-full max-w-xs" /></div>
+            <div><input type="text" placeholder="App Url" class="input input-bordered w-full max-w-xs" /></div>
+            <div><input type="text" placeholder="Mqtt Url" class="input input-bordered w-full max-w-xs" /></div>
+            <div><input type="text" placeholder="Mqtt Port" class="input input-bordered w-full max-w-xs" /></div>
+            <div><input type="text" placeholder="Mqtt Username" class="input input-bordered w-full max-w-xs" /></div>
+            <div><input type="text" placeholder="Mqtt Password" class="input input-bordered w-full max-w-xs" /></div>     
+            <div><input type="text" placeholder="Wifi SSID" class="input input-bordered w-full max-w-xs" /></div>
+            <div><input type="text" placeholder="Wifi Password" class="input input-bordered w-full max-w-xs" /></div>
+            <div><input type="text" placeholder="OTA Password" class="input input-bordered w-full max-w-xs" /></div>
+            <div><select class="select select-bordered w-full max-w-xs">
+                <option disabled selected>Esp Type</option>
+                <option value="esp32">Esp32</option>
+                <option value="esp8266">Esp8266</option>
+              </select></div>
+              
+           
+        </div>
+    </div>
+    
+    <!-- Page 2 -->
+    <div class="container mx-auto px-40 mt-16" id="page2" style="display: none;">
+        <h2 class="text-center mt-5">Paste Your Code Here</h2>
+        <div class="">
+            <textarea id="custom_function_code" name="custom_function_code"></textarea>
+        </div>
+    </div>
+ 
+    <div class="container mx-auto px-40 mt-16" id="page3" style="display: none;">
+        <div class="mt-10">
+            <textarea id="custom_function_code" name="custom_function_code"></textarea>
+        </div>
+    </div>
+ 
+
+
+    <!-- </div> -->
+
+
+    <script src="{{url_for('static',filename='src/js/custom.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/addon/display/fullscreen.js"></script>
+
+    <script src="{{url_for('static',filename='src/js/CodeMirror.js')}}"></script>
+
+</body>
+
+
+</html>

@@ -22,7 +22,7 @@
       "interval": 30000
     },
     "firmware": {
-      "version": 1.5,
+      "version": 1.1,
       "mac": 1000001,
       "update": "True",
       "url": "http://10.0.5.29:8080/firmware/esp8266/"

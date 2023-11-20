@@ -3,3 +3,25 @@
     position: absolute;
     clip: rect(1px, 1px, 1px, 1px);
 }
+
+.editor-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Style the fullscreen toggle button (you can customize this) */
+#toggleFullscreen {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 9999;
+}
+
+/* Style the CodeMirror editor to fill the container */
+.CodeMirror {
+    height: 100%;
+    width: 100%;
+}

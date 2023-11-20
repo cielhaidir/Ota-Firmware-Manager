@@ -1,6 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
   const checkboxes = document.querySelectorAll(".checkbox");
 
+  function showAlert(message) {
+    const alertBox = document.getElementById("custom-alert");
+    const alertMessage = alertBox.querySelector("span");
+    alertMessage.textContent = message;
+    alertBox.style.display = "block";
+    setTimeout(function () {
+      alertBox.style.display = "none";
+    }, 3000); // Hide the alert after 3 seconds (adjust the duration as needed)
+  }
 
   function handleAction(button, action) {
     button.addEventListener("click", function (event) {
@@ -44,14 +53,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
 })
 
-function showAlert(message) {
-  const alertBox = document.getElementById("custom-alert");
-  const alertMessage = alertBox.querySelector("span");
-  alertMessage.textContent = message;
-  alertBox.style.display = "block";
-  setTimeout(function () {
-    alertBox.style.display = "none";
-  }, 3000); // Hide the alert after 3 seconds (adjust the duration as needed)
-}
 
 
