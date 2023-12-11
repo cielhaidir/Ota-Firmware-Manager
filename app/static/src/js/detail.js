@@ -182,3 +182,30 @@ detailButtons.forEach(function (button) {
   });
 });
 
+const checkboxes = document.querySelectorAll('.toggle');
+
+checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function () {
+        const node_name = this.dataset.nodeName;
+        const ledStatus = this.checked ? 'ON' : 'OFF';
+
+        fetch('/update_config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                config_name: node_name,
+                led_status: ledStatus,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            // Handle the response if needed
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    });
+});

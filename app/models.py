@@ -1,9 +1,11 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-from app import db  # Import the db object from the app's __init__.py
 from datetime import datetime
+import uuid
+from werkzeug.security import generate_password_hash, check_password_hash
+from app import db
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     is_account_active = db.Column(db.Boolean, default=True)
@@ -35,3 +37,7 @@ class ChangeLog(db.Model):
     def __repr__(self):
         return f"ChangeLog(id={self.id}, version={self.version}, date={self.date})"
 
+        return True
+
+    def get_id(self):
+        return str(self.id)
