@@ -31,7 +31,7 @@
             </a>
           </li>
           <li><a>Settings</a></li>
-          <li><a>Logout</a></li>
+          <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
         </ul>
       </div>
     </div>
@@ -69,6 +69,8 @@
           </tr>
           {% else %}
           {% for node_name, data in mqtt_messages.items() %}
+            {% if node_name.startswith(user_id ~ '_') %}
+            {% set node_name = node_name.split('_')[1] %}
           <tr>
             <th>
               <label>
@@ -114,11 +116,13 @@
                     <div class="row-span-2 mt-5">
                       <p>{{node_name}}.json</p>
                       <form method="POST" action="{{ url_for('main.save_config', node_name=node_name) }}">
-                        <textarea name="config_content" rows="22" cols="60"
+                        <textarea name="config_content" rows="5" cols="60"
                           class="textarea textarea-bordered font-medium"
                           placeholder="Bio">{{ config_content }}</textarea>
                         <button class="btn" type="submit">Save</button>
                       </form>
+                      LED
+                      <input type="checkbox"  data-node-name="{{ node_name }}" class="toggle mt-5" />  
                     </div>
 
                     <div class="w-full">
@@ -146,35 +150,9 @@
                       <p class="mb-2 ms-5 mt-5">Firmware Change Log</p>
                       
                       <!-- Change Log -->
-                      <!-- <textarea name="config_content" rows="5" cols="55"
+                      <textarea name="config_content" rows="5" cols="55"
                         class="textarea textarea-bordered font-medium ms-5" placeholder="Bio"
-                        id="changeLogDisplay_{{ node_name }}" disabled></textarea> -->
-
-                        <div class="overflow-x-auto ms-5">
-                          <table class="table">
-                            <!-- head -->
-                            <thead>
-                              <tr>
-                                <th></th>
-                                <th>Version</th>
-                                <th>ChangeLog</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <th>1</th>
-                                <td>2.00</td>
-                                <td>Quality Control Specialist</td>
-                                <td>11:13:2023</td>
-                                <td><button class="btn btn-xs  join-item install-button"
-                                  data-node-name="{{ node_name }}">Rename</button><button class="btn btn-xs join-item install-button"
-                                  data-node-name="{{ node_name }}">Delete</button></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
+                        id="changeLogDisplay_{{ node_name }}" disabled></textarea>
 
 
                       <div class="mt-5">
@@ -243,6 +221,7 @@
 
     </th>
     </tr>
+    {% endif %}
     {% endfor %}
     {% endif %}
     </tbody>
