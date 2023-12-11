@@ -31,7 +31,7 @@
             </a>
           </li>
           <li><a>Settings</a></li>
-          <li><a>Logout</a></li>
+          <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
         </ul>
       </div>
     </div>
@@ -151,30 +151,37 @@
                         id="changeLogDisplay_{{ node_name }}" disabled></textarea> -->
 
                         <div class="overflow-x-auto ms-5">
-                          <table class="table">
-                            <!-- head -->
+                          <table class="table" style="border-collapse: collapse; width: 100%;">
                             <thead>
-                              <tr>
-                                <th></th>
-                                <th>Version</th>
-                                <th>ChangeLog</th>
-                                <th>Date</th>
-                                <th>Action</th>
+                              <tr style="border: 1px solid #ddd;">
+                                <th style="border: 1px solid #ddd;">No</th>
+                                <th style="border: 1px solid #ddd;">Version</th>
+                                <th style="border: 1px solid #ddd;">ChangeLog</th>
+                                <th style="border: 1px solid #ddd;">Date</th>
+                                <th style="border: 1px solid #ddd;">Action</th>
                               </tr>
                             </thead>
                             <tbody>
+                              {% set counter = 1 %}
+                              {% for change_log_entry in change_logs %}
+                              {% if change_log_entry.node_name == node_name %}
                               <tr>
-                                <th>1</th>
-                                <td>2.00</td>
-                                <td>Quality Control Specialist</td>
-                                <td>11:13:2023</td>
-                                <td><button class="btn btn-xs  join-item install-button"
-                                  data-node-name="{{ node_name }}">Rename</button><button class="btn btn-xs join-item install-button"
-                                  data-node-name="{{ node_name }}">Delete</button></td>
+                                <th style="border: 1px solid #ddd;">{{ counter }}</th>
+                                <td style="border: 1px solid #ddd;">{{ change_log_entry.version }}</td>
+                                <td style="border: 1px solid #ddd;">{{ change_log_entry.change_log }}</td>
+                                <td style="border: 1px solid #ddd;">{{ change_log_entry.date }}</td>
+                                <td style="border: 1px solid #ddd;">
+                                  <button class="btn btn-xs join-item install-button" data-node-name="{{ node_name }}">Rename</button>
+                                  <button class="btn btn-xs join-item install-button" data-node-name="{{ node_name }}">Delete</button>
+                                </td>
                               </tr>
+                              {% set counter = counter + 1 %}
+                              {% endif %} 
+                              {% endfor %}
                             </tbody>
                           </table>
                         </div>
+                                            
 
 
                       <div class="mt-5">

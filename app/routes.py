@@ -1,10 +1,13 @@
-from flask import Blueprint, jsonify, send_file, render_template, request, redirect, url_for, session
+from flask import Blueprint, jsonify, send_file, render_template, request, redirect, url_for, session, flash
+from flask_login import login_required  # Import login_required
+from .models import User, db
 from werkzeug.utils import secure_filename
 import os
 import paho.mqtt.client as mqtt
 from app.mqtt import mqtt_data,mqttc
 from datetime import datetime
 from packaging import version
+from app.models import ChangeLog
 
 main_bp = Blueprint('main', __name__)
 
@@ -25,7 +28,8 @@ def version_is_greater(new_version, existing_version):
 
 @main_bp.route("/")
 def main():
-    return render_template('index.html', mqtt_messages=mqtt_data)
+    change_logs = ChangeLog.query.all()
+    return render_template('index.html', mqtt_messages=mqtt_data, change_logs=change_logs)
 
 
 @main_bp.route("/compiler")
@@ -158,10 +162,12 @@ def upload_bin_and_log(node_name):
 
         # Create or append to the node_name.log file with version, changelog, and date
         change_log = request.form.get('change_log')
-        log_entry = f"Version: {version}\nChange Log: {change_log}\nDate: {datetime.now()}\n\n"
+        log_entry = ChangeLog(node_name=node_name,version=version, change_log=change_log, date=datetime.utcnow())
+        db.session.add(log_entry)
+        db.session.commit()
         
-        with open(f'source/{node_name}.log', 'a') as log_file:
-            log_file.write(log_entry)
+        # with open(f'source/{node_name}.log', 'a') as log_file:
+        #     log_file.write(log_entry)
 
         version_file_path = os.path.join(SOURCE_FOLDER_PATH, "bin", f"{mac.split('.')[0]}.version")
 
@@ -241,3 +247,59 @@ def classify_arduino_code(arduino_code):
         "setup": setup_code,
         "loop": loop_code,
     }
+
+auth_bp = Blueprint('auth', __name__)
+from flask_login import login_user, login_required, logout_user
+
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and user.check_password(password):
+            login_user(user)
+            flash('Login successful', 'success')
+            return redirect(url_for('main.main'))  # Redirect to the main blueprint's main route
+        else:
+            flash('Login failed. Check your username and password.', 'danger')
+
+    return render_template('login.html')
+
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        # Check if the password and confirm password match
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return redirect(url_for('auth.register'))
+
+        # Check if the username is already taken
+        if User.query.filter_by(username=username).first():
+            flash('Username already taken. Choose a different username.', 'danger')
+            return redirect(url_for('auth.register'))
+
+        # Add the new user to the database
+        new_user = User(username=username)
+        new_user.set_password(password)
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Registration successful. You can now log in.', 'success')
+        return redirect(url_for('main.main'))  # Redirect to the main blueprint's main route
+
+    return render_template('register.html')
+
+@auth_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('auth.login'))

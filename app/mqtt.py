@@ -13,6 +13,7 @@ mqtt_data = {}
 def on_message(client, userdata, message):
     topic = message.topic
     payload = message.payload.decode("utf-8")
+    print(payload)
     node_name = topic.split("/")[0]
 
     if node_name not in mqtt_data:
