@@ -1,3 +1,5 @@
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
@@ -18,7 +20,24 @@ class User(db.Model):
         return self.is_account_active
 
     def is_authenticated(self):
-        return True  # Anda dapat menyesuaikan ini berdasarkan logika otentikasi Anda
+        # Check if the user is authenticated
+        return True  # You can customize this based on your authentication logic
+
+
+    def get_id(self):
+        return str(self.id)
+    
+class ChangeLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    node_name = db.Column(db.Text, nullable=False)
+    version = db.Column(db.String(20), nullable=False)
+    change_log = db.Column(db.Text, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow())
+
+    def __repr__(self):
+        return f"ChangeLog(id={self.id}, version={self.version}, date={self.date})"
+
+        return True
 
     def get_id(self):
         return str(self.id)

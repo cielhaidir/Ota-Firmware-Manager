@@ -7,6 +7,7 @@ import paho.mqtt.client as mqtt
 from app.mqtt import mqtt_data,mqttc
 from datetime import datetime
 from packaging import version
+from app.models import ChangeLog
 import json
 
 main_bp = Blueprint('main', __name__)
@@ -29,9 +30,10 @@ def version_is_greater(new_version, existing_version):
 
 @main_bp.route("/")
 def main():
+    change_logs = ChangeLog.query.all()
     if 'user_id' in session:
         user_id = session['user_id']
-        return render_template('index.html', mqtt_messages=mqtt_data, user_id=user_id)
+        return render_template('index.html', mqtt_messages=mqtt_data, user_id=user_id, change_logs=change_logs)
     else:
         return redirect(url_for('auth.login'))
 
@@ -168,10 +170,12 @@ def upload_bin_and_log(node_name):
 
         # Create or append to the node_name.log file with version, changelog, and date
         change_log = request.form.get('change_log')
-        log_entry = f"Version: {version}\nChange Log: {change_log}\nDate: {datetime.now()}\n\n"
+        log_entry = ChangeLog(node_name=node_name,version=version, change_log=change_log, date=datetime.utcnow())
+        db.session.add(log_entry)
+        db.session.commit()
         
-        with open(f'source/{node_name}.log', 'a') as log_file:
-            log_file.write(log_entry)
+        # with open(f'source/{node_name}.log', 'a') as log_file:
+        #     log_file.write(log_entry)
 
         version_file_path = os.path.join(SOURCE_FOLDER_PATH, "bin", f"{mac.split('.')[0]}.version")
 
@@ -275,7 +279,7 @@ def login():
 
 import uuid
 from flask import request, flash, redirect, url_for, render_template
-from app.models import User  # Pastikan untuk mengganti import sesuai struktur proyek Anda
+from app.models import User 
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
