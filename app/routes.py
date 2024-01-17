@@ -9,6 +9,7 @@ from datetime import datetime
 from packaging import version
 from app.models import ChangeLog
 import json
+import shutil
 
 main_bp = Blueprint('main', __name__)
 
@@ -41,7 +42,8 @@ def main():
 
 @main_bp.route("/compiler")
 def compiler():
-    return render_template('compiler.html')
+    user_id = session['user_id']
+    return render_template('compiler.html', user_id=user_id)
 
 
 # ======================================================== #
@@ -50,8 +52,8 @@ def compiler():
 
 @main_bp.route('/update/<node>', methods=['GET'])
 def updateLatest(node):
- 
-    mqtt_topic = f"{node}/update"
+    user_id = session['user_id']
+    mqtt_topic = f"{user_id}_{node}/update"
     mqtt_message = "1"  
     mqttc.publish(mqtt_topic, mqtt_message)
     return jsonify({"status": "success", "message": "Firmware update message sent."}), 200
@@ -62,7 +64,8 @@ def updateCustom(node,version):
     version_parts = version.rsplit('.', 1)
     version_number = version_parts[0]
     print(version_number)
-    mqtt_topic = f"{node}/updateCustom"
+    user_id = session['user_id']
+    mqtt_topic = f"{user_id}_{node}/updateCustom"
     mqtt_message = version_number  
     mqttc.publish(mqtt_topic, mqtt_message)
     return jsonify({"status": "success", "message": "Firmware update message sent."}), 200
@@ -70,7 +73,9 @@ def updateCustom(node,version):
 
 @main_bp.route('/restart/<node>', methods=['GET'])
 def restart_node(node):
-    mqtt_topic = f"{node}/restart"
+    user_id = session['user_id']
+    mqtt_topic = f"{user_id}_{node}/restart"
+
     mqtt_message = "1"  
     mqttc.publish(mqtt_topic, mqtt_message, 0)
     print(mqtt_topic, mqtt_message)
@@ -79,10 +84,13 @@ def restart_node(node):
 
 @main_bp.route('/unlock/<node>', methods=['GET'])
 def unlock_node(node):
- 
-    mqtt_topic = f"{node}/unlock"
+    user_id = session['user_id']
+    mqtt_topic = f"{user_id}_{node}/unlock"
     mqtt_message = "1"  # You can customize this message
+    print(mqtt_topic)
+
     mqttc.publish(mqtt_topic, mqtt_message, 0)
+    # print(mqtt_topic)
     return jsonify({"status": "success", "message": "Firmware update message sent."}), 200
 
 
@@ -95,11 +103,18 @@ def unlock_node(node):
 
 @main_bp.route('/source/<config>', methods=['GET'])
 def check_config(config):
+    # user_id = session['user_id']
+    # firmware_path = get_firmware_path(user_id+'_'+config_name+'.json')
     firmware_path = get_firmware_path(config)
     if os.path.exists(firmware_path):
         return send_file(firmware_path, as_attachment=True)
     else:
-        return jsonify({"status": "not_found", "message": "Firmware tidak ditemukan."}), 404
+        template_path = get_firmware_path('example.json')
+        try:
+            shutil.copy(template_path, firmware_path)
+            return send_file(firmware_path, as_attachment=True)
+        except Exception as e:
+            return jsonify({"status": "error", "message": str(e)}), 500
 
 
 # ========================================================================================== #
@@ -136,8 +151,16 @@ def download_firmware(firmware_version):
 @main_bp.route('/save_config/<node_name>', methods=['POST'])
 def save_config(node_name):
     config_content = request.form['config_content']
-    with open(f'source/{node_name}.json', 'w') as config_file:
+    user_id = session['user_id']
+    with open(f'source/{user_id}_{node_name}.json', 'w') as config_file:
         config_file.write(config_content)
+
+    
+    mqtt_topic = f"{user_id}_{node_name}/updateconfig"
+    mqtt_message = "1"  # You can customize this message
+    print(mqtt_topic)
+    mqttc.publish(mqtt_topic, mqtt_message, 0)  
+
     return redirect(url_for('main.main'))
 
 
@@ -323,20 +346,71 @@ def logout():
 
 @main_bp.route('/update_config', methods=['POST'])
 def update_config():
-    # config_name = request.form['config_name']
-    config_name = "node1.json"
-    led_status = request.form['led_status']
-    firmware_path = get_firmware_path(config_name)
+    try:
+        config_name = request.form['config_name']
+        property_status = request.form['propertyStatus']
+        property_name = request.form['property']
+
+        firmware_path = get_firmware_path(config_name+'.json')
+        print(firmware_path)
+        # Load the existing configuration
+        with open(firmware_path, 'r') as file:
+            config = json.load(file)
+
+        # Update the specified property status
+        if 'main' not in config:
+            config['main'] = {}  # Ensure 'main' key exists
+
+        config['main'][property_name] = property_status
+
+        # Save the updated configuration
+        with open(firmware_path, 'w') as file:
+            json.dump(config, file, indent=2)
+
+
+        mqtt_topic = f"{config_name}/updateconfig"
+        mqtt_message = "1"  # You can customize this message
+        print(mqtt_topic)
+        mqttc.publish(mqtt_topic, mqtt_message, 0)  
+        return jsonify({"status": "success", "message": "Configuration updated successfully"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@main_bp.route('/updateChangelog/<id>', methods=['POST'])
+def update_changelog(id):
+    # Extract data from request (assuming JSON data in this example)
+    data = request.get_json()
+
+    new_version = data.get('version')
+    new_change_log = data.get('changeLog')
+
+    # Call the update function
+    result_message = ChangeLog.update_changelog_by_id(id, new_version, new_change_log)
+
+    return result_message
+
+@main_bp.route('/deletechangelog/<id>', methods=['GET'])
+def delete_entry(id):
+    if id:
+        ChangeLog.delete_entry_by_id(id)
+        return 'Entry deleted successfully'
+    else:
+        return 'Invalid entry ID', 400
+
+
+
+@main_bp.route('/get_config/<config_name>', methods=['GET'])
+def get_config(config_name):
+    firmware_path = get_firmware_path(config_name+'.json')
     print(firmware_path)
-    # Load the existing configuration
-    with open(firmware_path, 'r') as file:
-        config = json.load(file)
+    if not os.path.exists(firmware_path):
+        return jsonify({"status": "not_found", "message": "Firmware tidak ditemukan."}), 404
 
-    # Update the LED status
-    config['main']['led'] = led_status
+    try:
+        with open(firmware_path, 'r') as file:
+            config = json.load(file)
 
-    # Save the updated configuration
-    with open(firmware_path, 'w') as file:
-        json.dump(config, file, indent=2)
+        return jsonify({"status": "success", "config": config})
 
-    return jsonify({"status": "success", "message": "Configuration updated successfully"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500

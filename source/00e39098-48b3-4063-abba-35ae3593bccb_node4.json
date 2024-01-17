@@ -1,0 +1,9 @@
+{
+  "main": {
+    "dht22": "OFF"
+  },
+  "wifi": {
+    "ssid": "GRIM 7145",
+    "password": "qwerty123"
+  }
+}

@@ -1,6 +1,24 @@
 document.addEventListener("DOMContentLoaded", function () {
   const checkboxes = document.querySelectorAll(".checkbox");
 
+  const checkAll = document.getElementById('checkAll');
+
+  checkAll.addEventListener('change', function() {
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = checkAll.checked;
+    });
+  });
+  
+
+  checkboxes.forEach(individualCheckbox => {
+    individualCheckbox.addEventListener('change', function() {
+      if (this !== checkAll) {
+        const checkboxesArray = Array.from(checkboxes);
+        checkAll.checked = checkboxesArray.every(checkbox => checkbox.checked);
+      }
+    });
+  });
+  
   function showAlert(message) {
     const alertBox = document.getElementById("custom-alert");
     const alertMessage = alertBox.querySelector("span");
@@ -20,25 +38,32 @@ document.addEventListener("DOMContentLoaded", function () {
       const selectedNodeNames = Array.from(checkboxes)
         .filter((checkbox) => checkbox.checked)
         .map((checkbox) => checkbox.getAttribute("data-node-name"));
-
+        
+      const displayName = selectedNodeNames.length > 1 ? "Selected Node" : selectedNodeNames[0];
       // Iterate through selected node names and make requests
       selectedNodeNames.forEach(function (nodeName) {
-        const ip_server = self.location.host;
-        const url = `http://${ip_server}/${action}/${nodeName}`;
+        const protocol = window.location.protocol;
+        const ip_server = window.location.host;
+        const url = `${protocol}//${ip_server}/${action}/${nodeName}`;
+        // console.log(url);
 
         // Make an HTTP request for each selected node
         fetch(url, {
           method: "GET",
         })
           .then((response) => {
+            // console.log(response);
             if (response.ok) {
-              showAlert(`Successfully sent ${action} request for ${nodeName}`);
+              showAlert(`Successfully sent ${action} request for ${displayName}`);
+              setTimeout(() => {
+                location.reload();
+              }, 2000);
             } else {
-              showAlert(`Failed to send ${action} request for ${nodeName}`);
+              showAlert(`Failed to send ${action} request for ${displayName}`);
             }
           })
           .catch((error) => {
-            showAlert(`Error sending ${action} request for ${nodeName}: ${error}`);
+            showAlert(`Error sending ${action} request for ${displayName}: ${error}`);
           });
       });
     });

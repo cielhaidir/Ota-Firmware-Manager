@@ -1,0 +1,385 @@
+-- phpMyAdmin SQL Dump
+-- version 5.0.2
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Waktu pembuatan: 28 Des 2023 pada 21.48
+-- Versi server: 10.4.14-MariaDB
+-- Versi PHP: 7.3.22
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `kasus02_038`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `master_pembayaran`
+--
+
+CREATE TABLE `master_pembayaran` (
+  `id` int(5) NOT NULL,
+  `id_master_penerimaan` int(5) NOT NULL,
+  `nomor_pembayaran` varchar(5) NOT NULL,
+  `tgl_pembayaran` date NOT NULL,
+  `id_kasir` int(2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `master_pembayaran`
+--
+
+INSERT INTO `master_pembayaran` (`id`, `id_master_penerimaan`, `nomor_pembayaran`, `tgl_pembayaran`, `id_kasir`) VALUES
+(1, 5, 'B01', '2023-03-10', 2),
+(2, 8, 'B02', '2023-03-16', 2),
+(3, 4, 'B03', '2023-03-17', 2),
+(4, 3, 'B04', '2023-03-19', 1),
+(5, 1, 'B05', '2023-03-19', 1),
+(6, 7, 'B06', '2023-03-20', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `master_pemesanan`
+--
+
+CREATE TABLE `master_pemesanan` (
+  `id` int(10) NOT NULL,
+  `no_pemesanan` varchar(7) NOT NULL,
+  `tgl_pemesanan` date NOT NULL,
+  `id_vendor` int(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `master_pemesanan`
+--
+
+INSERT INTO `master_pemesanan` (`id`, `no_pemesanan`, `tgl_pemesanan`, `id_vendor`) VALUES
+(1, 'P001', '2023-02-01', 1),
+(2, 'P002', '2023-02-03', 2),
+(3, 'P003', '2023-02-06', 3),
+(4, 'P004', '2023-02-08', 1),
+(5, 'P005', '2023-02-09', 2),
+(6, 'P006', '2023-02-11', 3),
+(7, 'P007', '2023-02-13', 1),
+(8, 'P008', '2023-02-15', 2),
+(9, 'P009', '2023-02-17', 3),
+(10, 'P010', '2023-02-19', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `master_penerimaan`
+--
+
+CREATE TABLE `master_penerimaan` (
+  `id` int(8) NOT NULL,
+  `id_master_pemesanan` int(7) NOT NULL,
+  `tgl_penerimaan` date NOT NULL,
+  `id_yg_menerima` int(5) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `master_penerimaan`
+--
+
+INSERT INTO `master_penerimaan` (`id`, `id_master_pemesanan`, `tgl_penerimaan`, `id_yg_menerima`) VALUES
+(1, 3, '2023-03-01', 3),
+(2, 7, '2023-03-03', 1),
+(3, 1, '2023-03-05', 1),
+(4, 6, '2023-03-07', 3),
+(5, 4, '2023-03-09', 1),
+(6, 8, '2023-03-11', 2),
+(7, 5, '2023-03-13', 2),
+(8, 2, '2023-03-15', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `referensi_barang`
+--
+
+CREATE TABLE `referensi_barang` (
+  `id` int(5) NOT NULL,
+  `nama_barang` text NOT NULL,
+  `hrg_barang` int(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `referensi_barang`
+--
+
+INSERT INTO `referensi_barang` (`id`, `nama_barang`, `hrg_barang`) VALUES
+(1, 'Lightstick Blackpink\r\n', 650000),
+(2, 'Lightstick EXO\r\n', 750000),
+(3, 'Lightstick BTS', 550000),
+(4, 'Album Blackpink', 450000),
+(5, 'Album BTS', 350000);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `referensi_kasir`
+--
+
+CREATE TABLE `referensi_kasir` (
+  `id` int(5) NOT NULL,
+  `kasir` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `referensi_kasir`
+--
+
+INSERT INTO `referensi_kasir` (`id`, `kasir`) VALUES
+(1, 'Indah Sry Lestari'),
+(2, 'Nur Ilmi Handayani');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `referensi_vendor`
+--
+
+CREATE TABLE `referensi_vendor` (
+  `id` int(5) NOT NULL,
+  `nama_vendor` text NOT NULL,
+  `alamat_vendor` text NOT NULL,
+  `nomor_vendor` varchar(25) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `referensi_vendor`
+--
+
+INSERT INTO `referensi_vendor` (`id`, `nama_vendor`, `alamat_vendor`, `nomor_vendor`) VALUES
+(1, 'Lightstick Official\r\n', 'Jl. Printis Kemerdekaan\r\n', '0822-5096-0844'),
+(2, 'Budged Store\r\n', 'Jl. DR. Leimena\r\n', '0813-5473-5568'),
+(3, 'Dkpop\r\n', 'Jl. A. P. Pettarani\r\n', '0895-0199-1463');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `referensi_yg_menerima`
+--
+
+CREATE TABLE `referensi_yg_menerima` (
+  `id` int(5) NOT NULL,
+  `yg_menerima` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `referensi_yg_menerima`
+--
+
+INSERT INTO `referensi_yg_menerima` (`id`, `yg_menerima`) VALUES
+(1, 'Ade Fitra Maulina'),
+(2, 'Naurah Jinan Nadira'),
+(3, 'Asriyunita Ansar');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `rincian_pemesanan`
+--
+
+CREATE TABLE `rincian_pemesanan` (
+  `id` int(20) NOT NULL,
+  `id_master_pemesanan` int(5) NOT NULL,
+  `id_barang` int(5) NOT NULL,
+  `kuantitas_pesanan` int(5) NOT NULL,
+  `harga_barang` int(8) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `rincian_pemesanan`
+--
+
+INSERT INTO `rincian_pemesanan` (`id`, `id_master_pemesanan`, `id_barang`, `kuantitas_pesanan`, `harga_barang`) VALUES
+(1, 1, 1, 5, 650000),
+(2, 1, 4, 3, 450000),
+(3, 2, 2, 4, 750000),
+(4, 2, 3, 6, 550000),
+(5, 3, 5, 2, 350000),
+(6, 3, 4, 1, 450000),
+(7, 4, 5, 3, 350000),
+(8, 4, 1, 5, 650000),
+(9, 5, 1, 7, 650000),
+(10, 5, 3, 7, 550000),
+(11, 6, 2, 4, 270000),
+(12, 6, 4, 6, 450000),
+(13, 7, 3, 3, 550000),
+(14, 7, 4, 4, 450000),
+(15, 8, 4, 5, 450000),
+(16, 8, 5, 5, 350000),
+(17, 9, 1, 5, 650000),
+(18, 9, 2, 5, 750000),
+(19, 10, 3, 7, 550000),
+(20, 10, 5, 6, 350000);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `rincian_penerimaan`
+--
+
+CREATE TABLE `rincian_penerimaan` (
+  `id` int(5) NOT NULL,
+  `id_master_penerimaan` int(5) NOT NULL,
+  `kuantitas_diterima` int(5) NOT NULL,
+  `id_barang` int(5) NOT NULL,
+  `harga_diterima` int(8) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `rincian_penerimaan`
+--
+
+INSERT INTO `rincian_penerimaan` (`id`, `id_master_penerimaan`, `kuantitas_diterima`, `id_barang`, `harga_diterima`) VALUES
+(1, 1, 2, 5, 350000),
+(2, 1, 1, 4, 450000),
+(3, 2, 3, 3, 550000),
+(4, 2, 3, 4, 450000),
+(5, 3, 4, 1, 650000),
+(6, 3, 3, 4, 450000),
+(7, 4, 4, 2, 750000),
+(8, 4, 5, 4, 450000),
+(9, 5, 2, 5, 350000),
+(10, 5, 5, 3, 550000),
+(11, 6, 5, 4, 450000),
+(12, 6, 5, 5, 350000),
+(13, 7, 6, 1, 650000),
+(14, 7, 7, 3, 550000),
+(15, 8, 4, 2, 750000),
+(16, 8, 5, 3, 550000);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indeks untuk tabel `master_pembayaran`
+--
+ALTER TABLE `master_pembayaran`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `master_pemesanan`
+--
+ALTER TABLE `master_pemesanan`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `master_penerimaan`
+--
+ALTER TABLE `master_penerimaan`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `referensi_barang`
+--
+ALTER TABLE `referensi_barang`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `referensi_kasir`
+--
+ALTER TABLE `referensi_kasir`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `referensi_vendor`
+--
+ALTER TABLE `referensi_vendor`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `referensi_yg_menerima`
+--
+ALTER TABLE `referensi_yg_menerima`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `rincian_pemesanan`
+--
+ALTER TABLE `rincian_pemesanan`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `rincian_penerimaan`
+--
+ALTER TABLE `rincian_penerimaan`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT untuk tabel yang dibuang
+--
+
+--
+-- AUTO_INCREMENT untuk tabel `master_pembayaran`
+--
+ALTER TABLE `master_pembayaran`
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT untuk tabel `master_pemesanan`
+--
+ALTER TABLE `master_pemesanan`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT untuk tabel `master_penerimaan`
+--
+ALTER TABLE `master_penerimaan`
+  MODIFY `id` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT untuk tabel `referensi_barang`
+--
+ALTER TABLE `referensi_barang`
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT untuk tabel `referensi_kasir`
+--
+ALTER TABLE `referensi_kasir`
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT untuk tabel `referensi_vendor`
+--
+ALTER TABLE `referensi_vendor`
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT untuk tabel `referensi_yg_menerima`
+--
+ALTER TABLE `referensi_yg_menerima`
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT untuk tabel `rincian_pemesanan`
+--
+ALTER TABLE `rincian_pemesanan`
+  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT untuk tabel `rincian_penerimaan`
+--
+ALTER TABLE `rincian_penerimaan`
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

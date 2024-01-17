@@ -27,6 +27,9 @@ class User(db.Model):
     def get_id(self):
         return str(self.id)
     
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+
 class ChangeLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     node_name = db.Column(db.Text, nullable=False)
@@ -37,7 +40,31 @@ class ChangeLog(db.Model):
     def __repr__(self):
         return f"ChangeLog(id={self.id}, version={self.version}, date={self.date})"
 
-        return True
-
     def get_id(self):
         return str(self.id)
+    
+    def update_changelog_by_id(id, new_version, new_change_log):
+
+        changelog_entry = ChangeLog.query.get(id)
+
+        if changelog_entry:
+    
+            changelog_entry.version = new_version
+            changelog_entry.change_log = new_change_log
+
+            db.session.commit()
+
+            return f"ChangeLog entry with id {id} has been updated successfully."
+
+        return f"ChangeLog entry with id {id} not found."
+
+    def delete_entry_by_id(id):
+        
+        changelog_entry = ChangeLog.query.get(id)
+
+        if changelog_entry:
+            db.session.delete(changelog_entry)
+            db.session.commit()
+            return True
+        else:
+            return False

@@ -17,7 +17,7 @@
     <!-- NAVBAR -->
     <div class="navbar shadow-xl rounded-2xl px-40 py-4">
         <div class="flex-1">
-            <a class="btn btn-ghost normal-case text-xl">Ngota Update</a>
+            <a class="btn btn-ghost normal-case text-xl" href="{{ url_for('main.main') }}">Ngota Update</a>
         </div>
         <div class="flex-none">
             <div class="dropdown dropdown-end">
@@ -47,55 +47,63 @@
     <!-- NAVBAR -->
 
     <h1 class="text-5xl font-bold text-center mt-10">Web Compiler</h1>
-    
 
-    <div class="px-40 mt-16 fixed bottom-20">
-        <div class="join grid grid-cols-2">
-            <button id="prevButton" class="join-item btn btn-outline">Previous page</button>
-            <button id="nextButton" class="join-item btn btn-outline">Next</button>
-        </div>
-    </div>
-    
     <!--  Page 1 -->
-    <div class="container mx-auto px-40 mt-16" id="page1">
-        <div class="grid grid-cols-4 grid-rows-4 gap-4 text-center mt-10">
-            <div><input type="text" placeholder="Node Number" class="input input-bordered w-full max-w-xs" /></div>
-            <div><input type="text" placeholder="Custom Mac" class="input input-bordered w-full max-w-xs" /></div>
-            <div><input type="text" placeholder="Firmware Version" class="input input-bordered w-full max-w-xs" /></div>
-            <div><input type="text" placeholder="App Url" class="input input-bordered w-full max-w-xs" /></div>
-            <div><input type="text" placeholder="Mqtt Url" class="input input-bordered w-full max-w-xs" /></div>
-            <div><input type="text" placeholder="Mqtt Port" class="input input-bordered w-full max-w-xs" /></div>
-            <div><input type="text" placeholder="Mqtt Username" class="input input-bordered w-full max-w-xs" /></div>
-            <div><input type="text" placeholder="Mqtt Password" class="input input-bordered w-full max-w-xs" /></div>     
-            <div><input type="text" placeholder="Wifi SSID" class="input input-bordered w-full max-w-xs" /></div>
-            <div><input type="text" placeholder="Wifi Password" class="input input-bordered w-full max-w-xs" /></div>
-            <div><input type="text" placeholder="OTA Password" class="input input-bordered w-full max-w-xs" /></div>
-            <div><select class="select select-bordered w-full max-w-xs">
-                <option disabled selected>Esp Type</option>
-                <option value="esp32">Esp32</option>
-                <option value="esp8266">Esp8266</option>
-              </select></div>
-              
+    <div class="container mx-auto px-40 mt-5 h-96">
+        <div id="page1" >
+            <div class="grid grid-cols-4 grid-rows-4 gap-4 text-center mt-10">
+                <input name="uuid" type="hidden" value="{{ user_id }}" />
+                <div><input name="" type="text" placeholder="Node Number" class="input input-bordered w-full max-w-xs" />
+                </div>
+                <div><input name="" type="text" placeholder="Custom Mac" class="input input-bordered w-full max-w-xs" />
+                </div>
+                <div><input name="" id="version" type="text" placeholder="Firmware Version"
+                        class="input input-bordered w-full max-w-xs" /></div>
+                <div><input name="appurl" id="appurl" type="text" placeholder="App Url"
+                        class="input input-bordered w-full max-w-xs" /></div>
+                <div><input name="" type="text" placeholder="Mqtt Url" class="input input-bordered w-full max-w-xs" /></div>
+                <div><input name="" type="text" placeholder="Mqtt Port" class="input input-bordered w-full max-w-xs" />
+                </div>
+                <div><input name="" type="text" placeholder="Mqtt Username" class="input input-bordered w-full max-w-xs" />
+                </div>
+                <div><input name="" type="text" placeholder="Mqtt Password" class="input input-bordered w-full max-w-xs" />
+                </div>
+                <div><input name="" type="text" placeholder="Wifi SSID" class="input input-bordered w-full max-w-xs" />
+                </div>
+                <div><input name="" type="text" placeholder="Wifi Password" class="input input-bordered w-full max-w-xs" />
+                </div>
+                <div><input name="" type="text" placeholder="OTA Password" class="input input-bordered w-full max-w-xs" />
+                </div>
+                <div><select class="select select-bordered w-full max-w-xs">
+                        <option disabled hidden selected>Esp Type</option>
+                        <option value="esp32">Esp32</option>
+                        <option value="esp8266">Esp8266</option>
+                    </select></div>
+            </div>  
+        </div>
+        
+
+        <!-- Page 2 -->
+        <div id="page2" style="display: none;">
+            <h2 class="text-center">Copy This Code And Add Your Own Sensor</h2>
            
+            <div class="mt-5">
+                <textarea id="custom_function_code" name="custom_function_code" style="height: auto;"></textarea>
+            </div>
+            <br>
+            <br>
+            <!-- <button id="copyButton" class="btn  ">Copy</button> -->
         </div>
     </div>
-    
-    <!-- Page 2 -->
-    <div class="container mx-auto px-40 mt-16" id="page2" style="display: none;">
-        <h2 class="text-center mt-5">Paste Your Code Here</h2>
-        <div class="">
-            <textarea id="custom_function_code" name="custom_function_code"></textarea>
-        </div>
-    </div>
- 
-    <div class="container mx-auto px-40 mt-16" id="page3" style="display: none;">
-        <div class="mt-10">
-            <textarea id="custom_function_code" name="custom_function_code"></textarea>
-        </div>
-    </div>
- 
 
 
+
+    <footer class="h-10">
+        <div class="grid grid-cols-2 grid-rows-1 gap-2">
+            <div class="px-40"><button id="prevButton" class=" btn btn-outline" style="display: none;">Previous page</button></div>
+            <div class="px-40 ml-auto"><button id="nextButton" class=" btn btn-outline">Next</button></div>
+        </div>
+    </footer>
     <!-- </div> -->
 
 

@@ -22,6 +22,7 @@ def on_message(client, userdata, message):
     mqtt_data[node_name][field] = payload
 
 
+    # print(topic)
     # print(payload)
 
 def on_connect(client, userdata, flags, rc):

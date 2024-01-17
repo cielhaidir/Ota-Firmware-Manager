@@ -8,9 +8,9 @@
 </head>
 
 <body>
-  <div class="navbar shadow-xl rounded-2xl px-40 py-4">
+  <div class="navbar shadow-xl rounded-2xl px-40 py-4 ">
     <div class="flex-1">
-      <a class="btn btn-ghost normal-case text-xl">Ngota Update</a>
+      <a class="btn btn-ghost normal-case text-xl" href="{{ url_for('main.main') }}">Ngota Update</a>
     </div>
     <div class="flex-none">
       <div class="dropdown dropdown-end">
@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <div class="container mx-auto px-40 mt-16 ">
+  <div class="container mx-auto px-40 mt-16 mb-16">
 
     <!-- Alert -->
     <div id="custom-alert" class="alert shadow-lg" style="display: none;">
@@ -46,19 +46,20 @@
     <!-- Alert End -->
 
     <div class="overflow-x-auto">
-      <table class="table">
+      <table class="table ">
         <!-- head -->
         <thead>
           <tr>
             <th>
               <label>
-                <input type="checkbox" class="checkbox" />
+                <input type="checkbox" class="checkbox" id="checkAll"/>
               </label>
-            </th>
+            </th> 
             <th>Node Name</th>
             <th>Mac Address</th>
             <th>FM Version</th>
             <th>Unlocked</th>
+            <th>Status</th>
             <th></th>
           </tr>
         </thead>
@@ -68,9 +69,10 @@
             <td colspan="   2">No node is active</td>
           </tr>
           {% else %}
-          {% for node_name, data in mqtt_messages.items() %}
-            {% if node_name.startswith(user_id ~ '_') %}
-            {% set node_name = node_name.split('_')[1] %}
+          {% for node_name, data in mqtt_messages|dictsort %}
+          {% if node_name.startswith(user_id ~ '_') %}
+          {% set node_name = node_name.split('_')[1] %}
+          {% if data %}
           <tr>
             <th>
               <label>
@@ -98,10 +100,18 @@
               <div class="badge  badge-error">{{ data['unlockstatus'] }}</div>
             </td>
 
+            <td>
+              {% if data %}
+                <div class="badge badge-success">Up</div>
+              {% else %}
+                <div class="badge badge-error">Down</div>
+              {% endif %}
+            </td>
+
             </td>
             <th>
               <button class="btn detail-button" data-node-name="{{ node_name }}"
-                data-mac-addr="{{ data['mac_addr'] }}">Detail</button>
+                data-mac-addr="{{ data['mac_addr'] }}" data-user-id="{{ user_id }}">Detail</button>
 
 
               <!-- Modal -->
@@ -121,15 +131,17 @@
                           placeholder="Bio">{{ config_content }}</textarea>
                         <button class="btn" type="submit">Save</button>
                       </form>
-                      LED
-                      <input type="checkbox"  data-node-name="{{ node_name }}" class="toggle mt-5" />  
+                      <div class="switch-container" data-node-name="{{ node_name }}">
+                        <!-- The checkboxes will be dynamically added here -->
+                      </div>
+                  
                     </div>
 
                     <div class="w-full">
                       <p class="mb-2 ms-5 mt-5">Check Latest Firmware</p>
                       <div class="card bg-base-100 ms-5">
                         <div class="card-body">
-                          
+
                           <div class="grid grid-cols-2 grid-rows-1 gap-2">
                             <div>
                               <p>Current Version : {{data['version']}}</p>
@@ -148,45 +160,59 @@
 
                       </div>
                       <p class="mb-2 ms-5 mt-5">Firmware Change Log</p>
-                      
+
+                      <!-- Include jQuery -->
+                      <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
                       <!-- Change Log -->
-                      <textarea name="config_content" rows="5" cols="55"
-                        class="textarea textarea-bordered font-medium ms-5" placeholder="Bio"
-                        id="changeLogDisplay_{{ node_name }}" disabled></textarea> -->
+                      <div class="overflow-x-auto ms-5">
+                        <table class="table" style="border-collapse: collapse; width: 100%;">
+                          <thead>
+                            <tr style="border: 1px solid #ddd;">
+                              <th style="border: 1px solid #ddd;">No</th>
+                              <th style="border: 1px solid #ddd;">Version</th>
+                              <th style="border: 1px solid #ddd;">ChangeLog</th>
+                              <th style="border: 1px solid #ddd;">Date</th>
+                              <th style="border: 1px solid #ddd;">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% set counter = 1 %}
+                            {% for change_log_entry in change_logs %}
+                            {% if change_log_entry.node_name == node_name %}
+                            <tr>
+                              <th style="border: 1px solid #ddd;">{{ counter }}</th>
 
-                        <div class="overflow-x-auto ms-5">
-                          <table class="table" style="border-collapse: collapse; width: 100%;">
-                            <thead>
-                              <tr style="border: 1px solid #ddd;">
-                                <th style="border: 1px solid #ddd;">No</th>
-                                <th style="border: 1px solid #ddd;">Version</th>
-                                <th style="border: 1px solid #ddd;">ChangeLog</th>
-                                <th style="border: 1px solid #ddd;">Date</th>
-                                <th style="border: 1px solid #ddd;">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {% set counter = 1 %}
-                              {% for change_log_entry in change_logs %}
-                              {% if change_log_entry.node_name == node_name %}
-                              <tr>
-                                <th style="border: 1px solid #ddd;">{{ counter }}</th>
-                                <td style="border: 1px solid #ddd;">{{ change_log_entry.version }}</td>
-                                <td style="border: 1px solid #ddd;">{{ change_log_entry.change_log }}</td>
-                                <td style="border: 1px solid #ddd;">{{ change_log_entry.date }}</td>
-                                <td style="border: 1px solid #ddd;">
-                                  <button class="btn btn-xs join-item install-button" data-node-name="{{ node_name }}">Rename</button>
-                                  <button class="btn btn-xs join-item install-button" data-node-name="{{ node_name }}">Delete</button>
-                                </td>
-                              </tr>
-                              {% set counter = counter + 1 %}
-                              {% endif %} 
-                              {% endfor %}
-                            </tbody>
-                          </table>
-                        </div>
-                                            
+                              <td id="version_{{ change_log_entry.id }}" style="border: 1px solid #ddd;">
+                                <span class="display-text">{{ change_log_entry.version }}</span>
+                                <input type="text" name="version" value="{{ change_log_entry.version }}"
+                                  class="input input-xs w-full max-w-xs hidden" />
+                              </td>
 
+                              <td id="change_log_{{ change_log_entry.id }}" style="border: 1px solid #ddd;">
+                                <span class="display-text">{{ change_log_entry.change_log }}</span>
+                                <input type="text" name="change_log" value="{{ change_log_entry.change_log }}"
+                                  class="input input-xs w-full max-w-xs hidden" />
+                              </td>
+
+
+                              <td style="border: 1px solid #ddd;">{{ change_log_entry.date }}</td>
+
+                              <td style="border: 1px solid #ddd;">
+                                <button class="btn btn-xs join-item updatecl-button" data-node-name="{{ node_name }}"
+                                  data-entry-id="{{ change_log_entry.id }}">Update</button>
+                                <button class="btn btn-xs join-item save-button hidden" data-node-name="{{ node_name }}"
+                                  data-entry-id="{{ change_log_entry.id }}">Save</button>
+                                <button class="btn btn-xs join-item delete-button" data-node-name="{{ node_name }}"
+                                  data-entry-id="{{ change_log_entry.id }}">Delete</button>
+                              </td>
+                            </tr>
+                            {% set counter = counter + 1 %}
+                            {% endif %}
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
 
                       <div class="mt-5">
                         <p class="mb-2 ms-5">Install Custom Firmware</p>
@@ -195,8 +221,7 @@
                             id="firmwareSelect_{{node_name}}">
                             <option disabled selected>------------ Select Firmware to Install ------------</option>
                           </select>
-                          <button class="btn join-item install-button"
-                            data-node-name="{{ node_name }}">Install</button>
+                          <button class="btn join-item install-button" data-node-name="{{ node_name }}">Install</button>
                         </div>
                       </div>
 
@@ -255,21 +280,23 @@
     </th>
     </tr>
     {% endif %}
+    {% endif %}
     {% endfor %}
     {% endif %}
     </tbody>
 
     </table>
-  </div>
+ 
+
+
   <div class="fixed bottom-20">
     <button class="btn" id="unlock-button" href="{{ url_for('main.unlock_node', node=node_name) }}">Unlock</button>
     <button class="btn" id="restart-button" href="{{ url_for('main.restart_node', node=node_name) }}">Restart</button>
     <a class="btn" href="{{ url_for('main.compiler') }}">Add Node Configuration</a>
   </div>
-
-
   </div>
 
+  <br><br><br>
   <script src="{{url_for('static',filename='src/js/custom.js')}}"></script>
   <script src="{{url_for('static',filename='src/js/detail.js')}}"></script>
 </body>
